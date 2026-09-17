@@ -1,0 +1,71 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{xcolor}
+\geometry{letterpaper, margin=1in}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+\begin{center}
+    \textbf{Scratch Work and Derivations for Numerical PDEs Homework \#0}
+\end{center}
+% \textbf{For all problems asking for a graph:} you do not need to write up the method you programmed. Including plots of your solution and convergence is sufficient for full credit. The ideal homeowrk will have one, information-dense and properly labeled figure with a caption and a \emph{brief} discussion. \textbf{You must type up your HW.} I don't care if it's word or Tex as long as it's well organized, easy to follow, and submitted as a pdf.
+\textbf{Overview} This document contains derivations notes, and intermediate calculations used to develop the MATLAB implementations for Homework 0. It includes finite-difference stencils, boundary-condition treatments, truncation-error analysis, and reasoning behind matrix assembly for ODE and Poisson problems.\\
+
+\textbf{Problem 1: Finite differences}\\
+We approximate $f^\prime(x)$ using: 
+$$f^\prime(x_i)\approx \frac{f_{i+1}-f_{i-2}}{2\Delta x}.$$ 
+Boundary nodes use one-sided differences: 
+$$f^\prime(x_0)\approx \frac{f_1-f_0}{\Delta x},\qquad f^\prime(x_N)\approx\frac{f_N - f_{N-1}}{\Delta x}.$$ 
+Truncation error: \\
+\begin{center} Interior: $O(\Delta x^2),\qquad$ Boundary: $O(\Delta x).$\end{center}
+Norm analysis: 
+$$\ell_\infty = O(\Delta x),\qquad \ell_2 = O(\Delta x^{3/2}).$$
+\textbf{Extra Credit} 
+\begin{align*}
+    \Delta x&:=\frac{2\pi}{N},\,N\text{ large. Let }e_i\text{ be the error at each point }i,\,e_i=f^\prime(x_i)-f_n^\prime(x_i)\\
+   &\text{where }f\text{ is smooth and nonzero on the interval}\\
+    e_0&\sim\Delta x,\,e_n\sim\Delta x\,\text{ corresponding to the forward and backward difference estimated error}\\
+    e_i&\sim\Delta x^2\, \text{ corresponding to the centered difference estimated error}\\
+    &\ell_{2\text{ numerator}}=\left(\sum_{i=0}^N |e_i|^2 \right)^{1/2}\approx \sqrt{2(\Delta x)^2+(N-2)(\Delta x^2)^2}\approx \sqrt{2\Delta x^2+N\Delta x^4}\\
+    &\qquad\qquad\quad= \sqrt{2\left(\frac{2\pi}{N}\right)^2+N\left(\frac{2\pi}{N}\right)^4} \approx\sqrt{N^{-2}}=N^{-1}\quad \Rightarrow \ell_{2\text{ numerator}}\sim N^{-1}\\
+    &\ell_{2\text{ denominator}}=\sum_{i=0}^N|f(x_i)|^2\approx N\quad \Rightarrow \ell_{2\text{ denominator}}\sim\sqrt{N}\\
+    \ell_2&=\frac{\ell_{2\text{ numerator}}}{\ell_{2\text{ denominator}}}\sim\frac{N^{-1}}{N^{1/2}}=\frac{1}{N^{3/2}}
+\end{align*}
+\newpage
+\textbf{Problem 2: Second Derivative (Periodic)}\\
+Centered Second Derivative: 
+$$ f^{\prime\prime}(x_i)\approx \frac{f_{i+1} -2f_i + f_{i-1}}{\Delta x^2}.$$
+Periodic wrapping:
+$$f_{-1} = f_{N-1},\qquad f_{N+1}=f_1.$$
+Uniform truncation error:
+$$O(\Delta x^2)\quad\text{for all nodes.}$$
+
+\textbf{Problem 3: ODE}\\
+ODE:
+$$u^{\prime\prime}+\sin(x)u^\prime+u=f(x).$$
+Finite differences:
+$$u^{\prime\prime}(x_i)\approx\frac{u_{i+1}-2u_i+u_{i-1}}{\Delta x^2},\qquad u^\prime(x_i)\approx \frac{u_{i+1}-u_{i-1}}{2\Delta x}.$$
+Matrix coefficients:
+$$a_i = \frac{1}{\Delta x^2}-\frac{\sin(x_i)}{2\Delta x},\,b_i=-\frac{2}{\Delta x^2}+1,\,c_i = \frac{1}{\Delta x^2}+\frac{\sin(x_i)}{2\Delta x}.$$
+Dirichlet BCs modify the RHS:
+$$f_1\leftarrow f_1-a_1u_0,\qquad f_N\leftarrow f_N-c_Nu_L.$$
+\textbf{Problem 4: Poisson (Dirichlet)} \\
+Five-point Laplacian:
+$$(\Delta u)_{i,j}\approx \frac{u_{i+1,j}+u_{i-1,j}+u_{i,j+1}+u_{i,j-1}-4u_{i,j}}{h^2}.$$
+Dirichlet BCs:
+$$u = u_{\text{exact}}\text{ on boundary}.$$
+\textbf{Problem 4: Poisson (Neumann)} \\
+Neumann BC:
+$$\frac{\partial u}{\partial n}=g.$$
+Ghost point elimination:
+$$u_{0,j}=u_{1,j}-h\,g_{0,j},\qquad u_{N+1,j}=u_{N,j}+h\,g_{N,j}.$$
+Nullspace removal:
+$$u_{i_0,j_0} = u_\text{exact}(x_{i_0},y_{j_0})$$
+\end{document}

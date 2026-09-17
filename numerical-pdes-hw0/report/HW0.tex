@@ -1,0 +1,98 @@
+\documentclass[11pt]{article}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{geometry}
+\usepackage{multicol}
+\usepackage{xcolor}
+\geometry{letterpaper, margin=1in}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+\begin{center}
+    \textbf{Numerical PDEs Homework \#0}
+\end{center}
+% \textbf{For all problems asking for a graph: }you do not need to write up the method you programmed. Including plots of your solution and convergence is sufficient for full credit. The ideal homework will have one, information-dense and properly labeled figure with a caption and a \emph{brief} discussion. \textbf{You must type up your HW.} I don't care if its word or Tex as long as it's well organized, easy to follow, and submitted as a pdf.
+
+\textbf{Problem 1: Finite differences}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=.8\linewidth]{HW0/figures/p1_derivative.png}
+        \caption{Exact derivative $f^\prime(x)=\cos(x)e^{\sin(x)}$ and numerical derivative computed on uniform grid over $0\leq x\leq2\pi$.}
+    \end{figure}
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=.8\linewidth]{HW0/figures/p1_convergence.png}
+        \caption{Relative error for $p=\infty$ and $p=2$ norms as a function of grid size $N$ on a log-log scale. Reference lines with slopes $N^{-1}$ and $N^{-3/2}$ are shown.}
+    \end{figure}\\
+    \newpage
+    The first derivative of $f(x)=e^{\sin x}$ was approximated using second-order centered differences on interior nodes and first-order one-sided differences at the boundaries. This mixed discretization produces two distinct truncation error regimes: order $O(\Delta x)$ at the endpoints and order $O(\Delta x^2)$ in the interior. Consequently, the behavior of the global error depends on the chosen norm. The $\ell_\infty$ norm is dominated by the boundary contributions and therefore exhibits first-order convergence. In contrast, the $\ell_2$ norm averages the interior second-order errors with only two first-order boundary errors, yielding the observed $N^{-3/2}$ rate. This behavior is consistent with the structure of the finite-difference operator and the distribution of truncation errors across the grid.\\
+    
+    \textbf{Problem 1 Extra Credit: }Set $\Delta x=\frac{2\pi}{N}$ with $N$ large. Starting with the numerator, if we let $e_i=f'(x_i)-f_n'(x_i)$ then we know that $e_0$ and $e_N$ are on the order of $\Delta x$ since we computed them with forward difference and backward difference respectively since they have error like $O(\Delta x)$. Every other $e_i$ will be on the order of $\Delta x^2$ since we used centered difference which has error like $O(\Delta x^2)$. Then the $\ell_2$ norm is 
+    \begin{align*}
+        \left(\sum_{i=0}^N |e_i|^2 \right)^{1/2}&\approx \sqrt{2(\Delta x)^2+(N-2)(\Delta x^2)^2}\approx  \sqrt{2\Delta x^2+N\Delta x^4}\approx \sqrt{2N^{-2}+N^{-3}}\\
+        &\approx\sqrt{2N^{-2}}\text{ which is like } N^{-1}. 
+    \end{align*}
+    For the denominator, we know $f'(x)$ is smooth and nonzero on $[0,2\pi]$ so $\sum_{i=0}^N|f(x_i)|^2\approx N$, leaving the $\ell_2$ norm to be on the order of $\sqrt{N}$. Then our relative error combines the two to be on the estimated order of
+    \begin{equation*}
+        \frac{N^{-1}}{\sqrt{N}}=N^{-3/2}.
+    \end{equation*}\\
+\newpage
+\textbf{Problem 2: Second-order derivatives} 
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=.8\linewidth]{HW0/figures/p2_second_derivative.png}
+        \caption{Exact second derivative $f^{\prime\prime}(x)=e^{\sin x}\left(\cos^2x-\sin x \right)$ and numerical second derivative computed with centered differences and periodic wrapping.}
+    \end{figure}
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=.8\linewidth]{HW0/figures/p2_convergence.png}
+        \caption{Relative error convergence of the numerical first derivative using $p=\infty$ and $p=2$ norms as a function of grid size $N$ on a log-log scale. Reference line with slope $N^{-2}$ is included.}
+    \end{figure}\\
+    The second derivative was computed using the standard second-order centered finite-difference stencil. Periodicity was enforced by wrapping the grid, which eliminates the need for one-sided approximations and ensures that the truncation error remains uniformly on the order of $O(\Delta x^2)$ across all nodes. Because the discretization is consistent and the boundary treatment does not introduce lower-order erros, both the $\ell_\infty$ and $\ell_2$ norms exhibit second-order convergence. The results confirm that the periodic implementation preserves the theoretical accuracy of the centered second-difference operator.
+\newpage
+\textbf{Problem 3: ODE} 
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=.8\linewidth]{HW0/figures/p3_solution.png}
+        \caption{Exact solution $u(x)=\sin x$ and  numerical solution of $u^{\prime\prime}+\sin(x)u^{\prime}+u=f(x)$ on $[0,5]$ with Dirichlet boundary conditions.}
+    \end{figure}
+\begin{figure}[h!]
+        \centering
+        \includegraphics[width=.8\linewidth]{HW0/figures/p3_convergence.png}
+        \caption{Relative error convergence of the ODE solution using $p=\infty$ and $p=2$ norms as a function of grid size $N$ on a log-log scale. Reference line with slope $N^{-2}$ is included.}
+    \end{figure}\\
+    The ODE was discretized using second-order centered differences for both derivative terms, producing a linear system with a tridiagonal structure. To verify the method, the exact solution $u(x)=\sin x$ was imposed through the forcing term and Dirichlet boundary values. Because all derivative approximations are second-order and the boundary conditions are consistent with the exact solution, the global discretization error is expected to scale as $O(\Delta x^2)$. The convergence results demonstrate this behavior, indicating that the finite-difference formulation accurately captures both the first- and second-order derivative contributions in the ODE.
+\newpage
+\textbf{Problem 4: Poisson Equation with Dirichlet Boundary Conditions} 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{HW0/figures/p4_dirichlet_solution.png}
+    \caption{Numerical solution $u_n(x,y)$ and exact solution $u=\sin x\cos y$ for $\nabla^2u=-2\sin x\cos y$ on $[0,5]^2$ with Dirichlet boundary conditions.}
+\end{figure}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{HW0/figures/p4_dirichlet_convergence.png}
+    \caption{Relative error convergence for the Dirichlet Poisson solution using $p=\infty$ and $p=2$ norms as a function of grid size $N$ on a log-log scale. Reference line with slope $N^{-2}$ is included.}
+\end{figure}\\
+The Poisson equation $\nabla^2u=-2\sin x\cos y$ was solved on a uniform grid using the five-point Lablacian, which is second-order accurate in both spatial directions. Dirichlet boundary conditions were imposed directly from the exact solution, ensuring compatibility with the PDE and eliminating boundary-induced truncation error degradation. The resulting linear system is symmetric and well-posed. The observed second-order convergence in both norms aligns with the theoretical accuracy of the stencil and confirms that the boundary implementation preserves the method's global order.
+\newpage
+\textbf{Problem 4: Poisson Equation with Neumann Boundary Conditions}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{HW0/figures/p4_neumann_solution.png}
+    \caption{Numerical solution $u_n(x,y)$ and exact solution $u=\sin x\cos y$ for $\nabla^2u=-2\sin x\cos y$ on $[0,5]^2$ with Neumann boundary conditions.}
+\end{figure}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\linewidth]{HW0/figures/p4_neumann_convergence.png}
+    \caption{Relative error for $p=\infty$ and $p=2$ norms as a function of grid size $N$ on a log-log scale. Reference line with slope $N^{-2}$ is included.}
+\end{figure}\\
+\newpage
+For the Neumann boundary-value problem, the same five-point Laplacian was used, and normal-derivative boundary conditions were enforced via ghost-point elimination. The outward normal derivative was substituted into the finite-difference stencil, modifying the right-hand side by terms proportional to the prescribed Neumann data. This approach maintains second-order accuracy at the boundary while preserving the structure of the interior operator.\\
+Because the continuous Neumann Poisson equation is determined only up to an additive constant, the discrete Laplacian is singular. To obtain a unique numerical solution, a single grid value was fixed to the exact solution, removing the nullspace without altering the interior discretization. After this constraint was applied, the numerical solution agreed with the exact solution up to a constant shift, and both error norms exhibited second-order convergence. This confirms that the ghost-point Neumann treatment and the nullspace correction together yeild a consistent and accurate finite-difference formulation.
+
+\end{document}
