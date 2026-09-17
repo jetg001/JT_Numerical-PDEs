@@ -36,7 +36,15 @@ The repository is structured so new assignments can be added easily as the cours
 
 ```
 
-
+numerical-pdes/
+│
+├── hw1/
+│   ├── code/
+│   ├── utils/
+│   ├── figures/
+│   └── report/
+|
+└── README.md
 
 ```
 
