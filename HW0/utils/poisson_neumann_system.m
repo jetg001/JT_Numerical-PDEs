@@ -1,4 +1,4 @@
-function [A, F_vec, X, Y] = poisson_neumann_system(Nx, Ny, L, u_exact)
+function [A, F_vec, X, Y] = poisson_neumann_system(Nx, Ny, L, u_exact, f)
 %POISSON_NEUMANN_SYSTEM Build Neumann Poisson system on [0,L]^2.
 %
 % Constructs the 5-point Laplacian stencil for interior points and enforces
@@ -9,6 +9,7 @@ function [A, F_vec, X, Y] = poisson_neumann_system(Nx, Ny, L, u_exact)
 %   Nx, Ny  - number of interior points in x and y
 %   L       - domain length
 %   u_exact - exact solution function
+%   f       - forcing term (RHS)
 %
 % Outputs:
 %   A       - sparse matrix
@@ -21,7 +22,6 @@ x = linspace(0, L, Nx);
 y = linspace(0, L, Ny);
 [X,Y] = meshgrid(x, y);
 
-f = @(x,y)-2*sin(x).*cos(y);
 F_grid = h^2 * f(X,Y);
 
 g_left   = @(y) -cos(0)*cos(y);

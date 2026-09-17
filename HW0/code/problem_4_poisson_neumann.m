@@ -12,18 +12,20 @@
 % Figures generated:
 %   - p4_neumann_solution.png
 %   - p4_neumann_convergence.png
+
 clear; close all; clc;
 addpath('utils\');
 
 u_exact = @(x,y) sin(x).*cos(y);
-L = 5;
+f  = @(x,y)-2*sin(x).*cos(y);
+L  = 5;
 Ns = round(logspace(1.5, 2.5, 12));
 err_inf = zeros(size(Ns));
 err_2   = zeros(size(Ns));
 
 for m = 1:length(Ns)
     Nx = Ns(m); Ny = Nx;
-    [A, F_vec, X, Y] = poisson_neumann_system(Nx, Ny, L, u_exact);
+    [A, F_vec, X, Y] = poisson_neumann_system(Nx, Ny, L, u_exact, f);
 
     U_vec  = A \ F_vec;
     U = reshape(U_vec, Ny, Nx);
