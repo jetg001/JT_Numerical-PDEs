@@ -6,7 +6,6 @@
 %
 % Utilities used:
 %   - poisson_dirichlet_system.m
-%   - slanCM.m
 %   - format_loglog_axes.m
 %
 % Figures generated:
@@ -39,6 +38,7 @@ for m = 1:length(Ns)
 
     if m == 1
         figure;
+        set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
         colormap(slanCM('viridis'));
         cmin = min([U(:); u_ex(:)]);
         cmax = max([U(:); u_ex(:)]);
@@ -65,16 +65,15 @@ for m = 1:length(Ns)
         drawnow;
         pos1 = ax1.Position; pos2 = ax2.Position;
         gap_start = pos1(1) + pos1(3); gap_end = pos2(1);
-        cb_width = 0.025; cb_left = gap_start + (gap_end - gap_start)/2 - cb_width/2 + 0.05;
-        height_factor = 1.35; new_height = pos1(4)*height_factor; 
-        new_bottom = pos1(2) - (new_height - pos1(4))/2;
-        cb.Position = [cb_left, new_bottom, cb_width, new_height+0.01];
+        cb_width = 0.025; cb_left = gap_start + (gap_end - gap_start)/2 - cb_width/2 + 0.03;
+        cb.Position = [cb_left, 0.11, cb_width, 0.75];
         saveas(gcf, fullfile('figures', 'p4_dirichlet_solution.png'));
         hold off;
     end
 end
 
 figure;
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 loglog(Ns, err_inf, 'o-', 'Color', [0 0.6275 0.8431], 'LineWidth', 11, 'MarkerSize', 13); hold on;
 loglog(Ns, err_2, 's-', 'Color', [0.81 0.47 0.66], 'LineWidth', 9, 'MarkerSize', 11);
 grid on;

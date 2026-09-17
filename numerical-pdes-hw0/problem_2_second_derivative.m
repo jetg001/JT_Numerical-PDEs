@@ -27,6 +27,7 @@ f2p_num   = second_derivative_periodic(fx, dx);
 f2p_exact = f2p(x);
 
 figure;
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 plot(x, f2p_exact, 'Color', [0 0.6275 0.8431], 'LineWidth', 10);
 hold on;
 plot(x, f2p_num, '--', 'Color', [1 0.5 0], 'LineWidth', 14);
@@ -62,6 +63,7 @@ for k = 1:length(Ns)
 end
 
 figure;
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 loglog(Ns, err_inf, 'o-', 'Color', [0 0.6275 0.8431], 'LineWidth', 12, 'MarkerSize', 12);
 hold on;
 loglog(Ns, err_2, 's-', 'Color', [0.81 0.47 0.66], 'LineWidth', 10, 'MarkerSize', 10);

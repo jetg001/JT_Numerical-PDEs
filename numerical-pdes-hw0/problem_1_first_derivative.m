@@ -27,6 +27,7 @@ fp_num   = first_derivative_fd(fx, dx);
 fp_exact = fp(x);
 
 figure;
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 plot(x, fp_exact, 'Color', [0 0.6275 0.8431], 'LineWidth', 10); hold on;
 plot(x, fp_num, '--', 'Color', [1 0.5 0], 'LineWidth', 14)
 
@@ -64,6 +65,7 @@ for k = 1:length(Ns)
 end
 
 figure;
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 loglog(Ns, err_inf, 'o-', 'Color', [0 0.6275 0.8431], 'LineWidth', 10, 'MarkerSize', 10);
 hold on;
 loglog(Ns, err_2, 's-', 'Color', [0.81 0.47 0.66], 'LineWidth', 10, 'MarkerSize', 10);

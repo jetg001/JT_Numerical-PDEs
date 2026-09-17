@@ -42,6 +42,7 @@ for k = 1:length(Ns)
 
     if k == 1
         figure;
+        set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
         plot(x, u_ex, 'Color', [0 0.6275 0.8431], 'LineWidth', 18); hold on;
         plot(x, u_num, '--', 'Color', [1 0.5 0], 'LineWidth', 25);
         ylim([min(u_num)-0.1, max(u_num)+0.1]);
@@ -58,7 +59,7 @@ for k = 1:length(Ns)
 end
 
 figure;
-
+set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 loglog(Ns, err_inf, 'o-', 'Color', [0 0.6275 0.8431], 'LineWidth', 11, 'MarkerSize', 13); hold on;
 loglog(Ns, err_2, 's-', 'Color', [0.81 0.47 0.66], 'LineWidth', 9, 'MarkerSize', 11);
 grid on;
