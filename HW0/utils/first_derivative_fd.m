@@ -11,10 +11,10 @@ function fp_num = first_derivative_fd(fx, dx)
 % Output: 
 %   fp - numerical first derivative
 
-N = numel(fx);
-fp_num = zeros(size(fx));
+N = numel(fx); % number of gridpoints
+fp_num = zeros(size(fx)); % initialize vector for numerical solution storage
 
-fp_num(1) = (fx(2) - fx(1)) / dx;
-fp_num(N) = (fx(N) - fx(N-1)) / dx;
-fp_num(2:N-1) = (fx(3:N) - fx(1:N-2)) / (2*dx);
+fp_num(1) = (fx(2) - fx(1)) / dx;   % forward difference at left boundary
+fp_num(N) = (fx(N) - fx(N-1)) / dx; % backward difference at right boundary
+fp_num(2:N-1) = (fx(3:N) - fx(1:N-2)) / (2*dx); % centered difference at interior points
 end

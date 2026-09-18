@@ -16,20 +16,23 @@ function [A, f_i] = ode_matrix(x_i, dx, u0, uN, f)
 %   A   - sparse tridiagonal matrix
 %   f_i - right-hand side vector
 
-N = numel(x_i);
-s_i = sin(x_i);
+N = numel(x_i); % number of grid points
+s_i = sin(x_i); % sin function computed over interior gridpoints
 
-a_i = 1/dx^2 - s_i/(2*dx);
-b_i = -2/dx^2 + 1;
-c_i = 1/dx^2 + s_i/(2*dx);
+a_i = 1/dx^2 - s_i/(2*dx); % left neighbor coefficient
+b_i = -2/dx^2 + 1;         % center coefficient
+c_i = 1/dx^2 + s_i/(2*dx); % right neighbor coefficient
 
+
+% build sparse matrix
 rows = [2:N, 1:N, 1:N-1];
 cols = [1:N-1, 1:N, 2:N];
 vals = [a_i(2:end), b_i*ones(1,N), c_i(1:end-1)];
 
 A = sparse(rows, cols, vals, N, N);
 
-f_i      = f(x_i)';
-f_i(1)   = f_i(1)   - a_i(1)*u0;
-f_i(end) = f_i(end) - c_i(end)*uN;
+% build RHS vector and apply Dirichlet boundary conditions
+f_i      = f(x_i)'; % forcing term evaluated on interior grid
+f_i(1)   = f_i(1)   - a_i(1)*u0;    % left boundary
+f_i(end) = f_i(end) - c_i(end)*uN;  % right boundary
 end

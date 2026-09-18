@@ -14,46 +14,51 @@
 clear; close all; clc;
 addpath('utils\');
 
-u_exact = @(x) sin(x);
-f       = @(x) sin(x).*cos(x);
+u_exact = @(x) sin(x);          % test solution
+f       = @(x) sin(x).*cos(x);  % solved for based on test solution
 
-a = 0; b = 5;
-u0 = u_exact(a);
-uN = u_exact(b);
+a = 0; b = 5;       % boundary points
+u0 = u_exact(a);    % left dirichlet boundary
+uN = u_exact(b);    % right dirichlet boundary
 
+% error convergence over loglog grid
 Ns = round(logspace(2, 4, 20));
 err_inf = zeros(size(Ns));
 err_2   = zeros(size(Ns));
 
 for k = 1:length(Ns)
-    N  = Ns(k);
-    x  = linspace(a, b, N+1);
-    dx = x(2) - x(1);
+    N  = Ns(k);     % number of gridpoints
+    x  = linspace(a, b, N+1);   % discretized grid
+    dx = x(2) - x(1);           % discretization size
 
-    x_i = x(2:N);
-    [A, f_i] = ode_matrix(x_i, dx, u0, uN, f);
+    x_i = x(2:N);   % define interior points 
+    [A, f_i] = ode_matrix(x_i, dx, u0, uN, f); % call ode to assemble interior linear system
 
-    u_sol = A \ f_i;
-    u_num = [u0; u_sol; uN];
-    u_ex  = u_exact(x)';
+    u_sol = A \ f_i;         % solve interior linear system
+    u_num = [u0; u_sol; uN]; % put endpoints back into solution
+    u_ex  = u_exact(x)';     % exact test solution solved over discretized grid
 
-    err_inf(k) = norm(u_ex - u_num, Inf) / norm(u_ex, Inf);
-    err_2(k)   = norm(u_ex - u_num, 2)   / norm(u_ex, 2);
+    err_inf(k) = norm(u_ex - u_num, Inf) / norm(u_ex, Inf); % l-infinity norm
+    err_2(k)   = norm(u_ex - u_num, 2)   / norm(u_ex, 2);   % l-2 norm
 
+    % plot exact vs numerical solution for least-discretized space
     if k == 1
         figure;
-        set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
+        set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]); % automatically outputs full-screen figure
         plot(x, u_ex, 'Color', [0 0.6275 0.8431], 'LineWidth', 18); hold on;
-        plot(x, u_num, '--', 'Color', [1 0.5 0], 'LineWidth', 25);
+        plot(x, u_num, '--', 'Color', [1 0.5 0], 'LineWidth', 25);   % accessible contrast lines
+
+        % figure polishing
         ylim([min(u_num)-0.1, max(u_num)+0.1]);
         set(gca, 'XTick', 0:5, 'XTickLabel', {'$0$', '$1$', '$2$', '$3$', '$4$', '$5$'}, 'TickLabelInterpreter', 'latex');
         ax = gca; ax.FontSize = 35;
+
         xlabel('$x$', 'FontSize', 30, 'FontWeight', 'bold', 'Interpreter', 'latex');
         ylabel('Solution to ODE', 'FontSize', 30, 'FontWeight', 'bold', 'Interpreter', 'latex');
         title('Exact vs Numerical Solution to $u^{\prime\prime}+\sin(x)u^\prime+u(x)=f(x)$','FontSize', 35, 'FontWeight', 'bold', ...
             'Interpreter', 'latex');
         legend({'Exact: $u(x) = \sin(x)$', 'Numerical: $u_n(x)$'}, 'FontSize', 45, 'FontWeight', 'bold', 'Location', 'southwest', 'Interpreter', 'latex');
-        saveas(gcf, fullfile('figures', 'p3_solution.png'));
+        saveas(gcf, fullfile('figures', 'p3_solution.png')); % automatically save figure (will be full-screen sized)
         hold off;
     end
 end
@@ -63,7 +68,7 @@ set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 loglog(Ns, err_inf, 'o-', 'Color', [0 0.6275 0.8431], 'LineWidth', 11, 'MarkerSize', 13); hold on;
 loglog(Ns, err_2, 's-', 'Color', [0.81 0.47 0.66], 'LineWidth', 9, 'MarkerSize', 11);
 grid on;
-loglog(Ns, Ns.^(-2), '--', 'Color', [0.83 0.37 0], 'LineWidth', 10);
+loglog(Ns, Ns.^(-2), '--', 'Color', [0.83 0.37 0], 'LineWidth', 10); % all lines accessible contrast
 set(gca, 'XTick', [1e2 1e3 1e4], 'XTickLabel', {'$10^2$', '$10^3$', '$10^4$'}, 'TickLabelInterpreter', 'latex');
 format_loglog_axes();
 xlabel('$N$ gridpoints','Interpreter', 'latex');

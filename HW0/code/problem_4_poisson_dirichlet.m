@@ -15,34 +15,41 @@
 clear; close all; clc;
 addpath('utils\');
 
-u_exact = @(x,y) sin(x).*cos(y);
-L = 5;
-Ns = round(logspace(1.5, 2.5, 12));
+u_exact = @(x,y) sin(x).*cos(y);    % test solution
+f = @(x,y) -2*sin(x).*cos(y);       % solved for based on test solution
+L = 5; % length of interval
+
+% error convergence over loglog grid
+Ns = round(logspace(1.5, 2.5, 12)); 
 err_inf = zeros(size(Ns));
 err_2   = zeros(size(Ns));
 
 for m = 1:length(Ns)
-    Nx = Ns(m); Ny = Nx;
-    [A, F_vec, X_full, Y_full, U_bc] = poisson_dirichlet_system(Nx, Ny, L, u_exact);
+    Nx = Ns(m); Ny = Nx; % number of gridpoints in each direction
+    [A, F_vec, X_full, Y_full, U_bc] = poisson_dirichlet_system(Nx, Ny, L, u_exact, f); % call code to assemble linear system
 
-    U_vec  = A \ F_vec;
-    U_grid = reshape(U_vec, Ny, Nx).';
+    U_vec  = A \ F_vec;  % solve system
+    U_grid = reshape(U_vec, Ny, Nx).'; % reshape for compatability
 
     U = U_bc;
-    U(2:end-1, 2:end-1) = U_grid;
+    U(2:end-1, 2:end-1) = U_grid;   % combine sovled system with boundaries
 
-    u_ex = u_exact(X_full, Y_full);
+    u_ex = u_exact(X_full, Y_full); % exact test solution solved over discretized grid
 
-    err_inf(m) = norm(u_ex - U, Inf) / norm(u_ex, Inf);
-    err_2(m)   = norm(u_ex - U, 2)   / norm(u_ex, 2);
+    err_inf(m) = norm(u_ex - U, Inf) / norm(u_ex, Inf); % l-infinity norm
+    err_2(m)   = norm(u_ex - U, 2)   / norm(u_ex, 2);   % l-2 norm
 
+    % plot exact vs numerical solution for least-discretized grid
     if m == 1
         figure;
-        set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
-        colormap(slanCM('viridis'));
+        set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]); % automatically outputs full-screen figure
+        % figure tile setup
+        colormap(slanCM('viridis')); % slanCM color package used
         cmin = min([U(:); u_ex(:)]);
         cmax = max([U(:); u_ex(:)]);
         t = tiledlayout(1, 2, 'TileSpacing', 'loose', 'Padding', 'compact');
+        
+        % numerical solution tile
         ax1 = nexttile;
         surf(X_full,Y_full, U, 'EdgeColor','none'); view(2); shading interp; hold on;
         xlim([0 5]); ylim([0,5]); clim([cmin cmax]);
@@ -52,6 +59,7 @@ for m = 1:length(Ns)
         ylabel('$y$', 'FontSize', 25, 'FontWeight', 'bold', 'Interpreter', 'latex');
         title('Numerical: $u_n(x,y)$', 'FontSize', 25, 'FontWeight', 'bold', 'Interpreter', 'latex');
         
+        % exact solution tile
         ax2 = nexttile;
         surf(X_full,Y_full, u_ex, 'EdgeColor','none'); view(2); shading interp; hold on;
         xlim([0 5]); ylim([0 5]); clim([cmin cmax]);
@@ -61,13 +69,14 @@ for m = 1:length(Ns)
         title('Exact: $u(x,y)=\sin(x)\cos(y)$', 'FontSize', 25, 'FontWeight', 'bold', 'Interpreter', 'latex');
         title(t, 'Numerical (Dirichlet) vs Exact Solution of the Poisson Equation', 'FontSize', 28, 'FontWeight', 'bold', 'Interpreter', 'latex');
         
+        % custom colorbar
         cb = colorbar; cb.Parent = t; cb.FontSize = 20;  cb.TickLabelInterpreter = 'latex';
         drawnow;
         pos1 = ax1.Position; pos2 = ax2.Position;
         gap_start = pos1(1) + pos1(3); gap_end = pos2(1);
         cb_width = 0.025; cb_left = gap_start + (gap_end - gap_start)/2 - cb_width/2 + 0.03;
         cb.Position = [cb_left, 0.11, cb_width, 0.75];
-        saveas(gcf, fullfile('figures', 'p4_dirichlet_solution.png'));
+        saveas(gcf, fullfile('figures', 'p4_dirichlet_solution.png')); % automatically save figure (will be full-screen sized)
         hold off;
     end
 end
@@ -77,7 +86,7 @@ set(gcf, 'Units', 'normalized', 'OuterPosition', [0 0 1 1]);
 loglog(Ns, err_inf, 'o-', 'Color', [0 0.6275 0.8431], 'LineWidth', 11, 'MarkerSize', 13); hold on;
 loglog(Ns, err_2, 's-', 'Color', [0.81 0.47 0.66], 'LineWidth', 9, 'MarkerSize', 11);
 grid on;
-loglog(Ns, Ns.^(-2), '--', 'Color', [0.83 0.37 0], 'LineWidth', 10);
+loglog(Ns, Ns.^(-2), '--', 'Color', [0.83 0.37 0], 'LineWidth', 10); % all lines accessible contrast
 set(gca, 'XTick', [50 1e2 2e2 3e2], 'XTickLabel', { '$50$', '$100$', '$200$', '$300$'}, 'TickLabelInterpreter', 'latex');
 set(gca, 'YTick', [1e-5 1e-4 1e-3], 'YTickLabel', { '$10^{-5}$', '$10^{-4}$', '$10^{-3}$'})
 format_loglog_axes();
